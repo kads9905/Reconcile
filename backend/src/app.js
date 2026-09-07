@@ -20,4 +20,15 @@ import healthRouter from "./routes/health.routes.js";
 
 app.use("/api/v1/health", healthRouter);
 
+// 404 middleware
+import { notFound } from "./middleware/notFound.middleware.js";
+
+app.use(notFound);
+
+
+// global error middleware
+import { errorHandler } from "./middleware/error.middleware.js";
+
+app.use(errorHandler);
+
 export { app };
