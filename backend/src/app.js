@@ -17,8 +17,12 @@ app.use(cookieParser());
 
 // routes
 import healthRouter from "./routes/health.routes.js";
+import authRouter from "./routes/auth.routes.js";
 
 app.use("/api/v1/health", healthRouter);
+
+app.use("/api/v1/auth", authRouter);
+
 
 // 404 middleware
 import { notFound } from "./middleware/notFound.middleware.js";
