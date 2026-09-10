@@ -7,7 +7,10 @@ import cookieParser from "cookie-parser";
 const app = express();
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
 app.use(morgan("dev"));
 
 app.use(express.json());
@@ -18,10 +21,13 @@ app.use(cookieParser());
 // routes
 import healthRouter from "./routes/health.routes.js";
 import authRouter from "./routes/auth.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 app.use("/api/v1/health", healthRouter);
 
 app.use("/api/v1/auth", authRouter);
+
+app.use("/api/v1/users", userRouter);
 
 
 // 404 middleware

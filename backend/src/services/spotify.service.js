@@ -5,17 +5,20 @@ const scopes = [
   "playlist-modify-public",
 ].join(" ");
 
-const generateSpotifyAuthURL = () => {
+
+const generateSpotifyAuthURL = (state) => {
   const params = new URLSearchParams({
     client_id: process.env.SPOTIFY_CLIENT_ID,
     response_type: "code",
     redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
     scope: scopes,
     show_dialog: "true",
+    state,
   });
 
-  return `https://accounts.spotify.com/authorize?${params}`;
+  return `https://accounts.spotify.com/authorize?${params.toString()}`;
 };
+
 
 const exchangeCodeForTokens = async (code) => {
   const credentials = Buffer.from(
@@ -41,6 +44,7 @@ const exchangeCodeForTokens = async (code) => {
 
   return await response.json();
 };
+
 
 const getSpotifyProfile = async (accessToken) => {
   const response = await fetch("https://api.spotify.com/v1/me", {

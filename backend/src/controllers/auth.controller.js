@@ -10,13 +10,13 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 
 const connectSpotify = (req, res) => {
-  const url = generateSpotifyAuthURL();
+  const url = generateSpotifyAuthURL(req.user._id.toString());
 
   return res.redirect(url);
 };
 
 const spotifyCallback = asyncHandler (async (req, res) => {
-    const { code } = req.query;   
+    const { code, state } = req.query;   
     // 1. Exchange code for spotify tokens
     const tokens = await exchangeCodeForTokens(code);
     
@@ -26,7 +26,7 @@ const spotifyCallback = asyncHandler (async (req, res) => {
   // 3. save or update the connected account
     const connectedAccount = await ConnectedAccount.findOneAndUpdate(
         {
-            user: req.user._id,
+            user: state,
             provider: "spotify",
         },
         {
@@ -41,14 +41,20 @@ const spotifyCallback = asyncHandler (async (req, res) => {
         }
     );
 
-
-
     return res
     .status(200)
     .json({
         success: true,
         message: "Spotify connected successfully",
-        tokens,
+        data: {
+            _id: connectedAccount._id,
+            provider: connectedAccount.provider,
+            providerUserId: connectedAccount.providerUserId,
+            user: connectedAccount.user,
+            expiresAt: connectedAccount.expiresAt,
+            createdAt: connectedAccount.createdAt,
+            updatedAt: connectedAccount.updatedAt,
+        },
     });
 });
 

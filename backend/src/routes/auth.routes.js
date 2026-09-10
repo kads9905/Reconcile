@@ -15,7 +15,7 @@ router.get(
 
 router.get(
     "/spotify/callback",
-    verifyJWT,
+    // verifyJWT,  -> removed cuz the callback comes from spotify not from logged in reconcile session
     spotifyCallback
 );
 
