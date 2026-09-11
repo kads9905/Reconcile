@@ -60,8 +60,57 @@ const getSpotifyProfile = async (accessToken) => {
   return await response.json();
 };
 
+// fetch playlist from spotify
+const getCurrentUserPlaylists = async (accessToken) => {
+  const response = await fetch(
+    "https://api.spotify.com/v1/me/playlists?limit=50",
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch Spotify playlists");
+  }
+
+  return await response.json();
+};
+
+
+const refreshSpotifyAccessToken = async (refreshToken) => {
+  const credentials = Buffer.from(
+    `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+  ).toString("base64");
+
+  const response = await fetch(
+    "https://accounts.spotify.com/api/token",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: refreshToken,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to refresh Spotify access token");
+  }
+
+  return await response.json();
+};
+
+
 export {
   generateSpotifyAuthURL,
   exchangeCodeForTokens,
   getSpotifyProfile,
+  getCurrentUserPlaylists,
+  refreshSpotifyAccessToken
 };

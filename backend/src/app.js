@@ -22,12 +22,15 @@ app.use(cookieParser());
 import healthRouter from "./routes/health.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
+import playlistRouter from "./routes/playlist.routes.js";
 
 app.use("/api/v1/health", healthRouter);
 
 app.use("/api/v1/auth", authRouter);
 
 app.use("/api/v1/users", userRouter);
+
+app.use("/api/v1/playlists", playlistRouter);
 
 
 // 404 middleware
