@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import mongoose from "mongoose";
 
 import { ConnectedAccount } from "../models/connectedAccount.model.js";
 import { Playlist } from "../models/playlist.model.js";
@@ -10,6 +11,9 @@ import {
     refreshSpotifyAccessToken,
 } from "../services/spotify.service.js";
 
+
+//this is sunc operation - this changes db 
+// synchronization endpoint that fetches data from Spotify and persists it using bulkWrite.
 const importSpotifyPlaylists = asyncHandler(async (req, res) => {4
     // find connected spotify account
   const connectedAccount = await ConnectedAccount.findOne({
@@ -91,6 +95,57 @@ const importSpotifyPlaylists = asyncHandler(async (req, res) => {4
 });
 
 
+// this is read operation - never contacts spotify
+// all playlists
+// read endpoint that serves the already-synchronized data from MongoDB
+const getUserPlaylists = asyncHandler(async (req, res) => {
+  const playlists = await Playlist.find({
+    user: req.user._id,
+  }).sort({ updatedAt: -1 });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      playlists,
+      "Playlists fetched successfully"
+    )
+  );
+});
+
+
+
+// only specific playlist
+const getPlaylistById = asyncHandler(async (req, res) => {
+    const { playlistId } = req.params;
+
+    // validate mongodb objectid
+    if(!mongoose.Types.ObjectId.isValid(playlistId)){
+        throw new ApiError(400, "Invalid playlist ID");
+    }
+    
+    const playlist = await Playlist.findOne({
+        _id: playlistId,
+        user: req.user._id,
+    });
+
+    if(!playlist) {
+        throw new ApiError(404, "Playlist not found");
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            playlist,
+            "Playlist fetched successfully"
+        )
+    );
+});
+
+
 export {
     importSpotifyPlaylists,
+    getUserPlaylists,
+    getPlaylistById,
 }
